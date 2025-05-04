@@ -3,7 +3,7 @@
 
     .navbar {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 10px; background: #222;
+      padding: 10px; background: #000;
     }
 
     .navbar img { height: 40px; }
