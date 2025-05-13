@@ -1,4 +1,4 @@
-const API_KEY = '0e353f7fa86de4e23d8b45ed77a607b0';
+const API_KEY = 'a1e72fd93ed59f56e6332813b9f8dcae';
     const BASE_URL = 'https://api.themoviedb.org/3';
     const IMG_URL = 'https://image.tmdb.org/t/p/original';
     let currentItem;
@@ -8,19 +8,28 @@ const API_KEY = '0e353f7fa86de4e23d8b45ed77a607b0';
       const data = await res.json();
       return data.results;
     }
-
+    async function fetchTrendingSorted(type) {
+      const results = await fetchTrending(type);
+      return results.sort((a, b) => new Date(b.release_date || b.first_air_date) - new Date(a.release_date || a.first_air_date));
+    }
     async function fetchTrendingAnime() {
   let allResults = [];
-
-  // Fetch from multiple pages to get more anime (max 3 pages for demo)
+  allResults.sort((a, b) => new Date(b.release_date || b.first_air_date) - new Date(a.release_date || a.first_air_date));
+  // Use Promise.all to fetch multiple pages concurrently
+  const pagePromises = [];
   for (let page = 1; page <= 3; page++) {
-    const res = await fetch(`${BASE_URL}/trending/tv/week?api_key=${API_KEY}&page=${page}`);
+    pagePromises.push(fetch(`${BASE_URL}/trending/tv/week?api_key=${API_KEY}&page=${page}`));
+  }
+
+  const responses = await Promise.all(pagePromises);
+  for (const res of responses) {
     const data = await res.json();
     const filtered = data.results.filter(item =>
       item.original_language === 'ja' && item.genre_ids.includes(16)
     );
     allResults = allResults.concat(filtered);
   }
+  // Removed redundant loop to avoid duplication
 
   return allResults;
 }
@@ -120,4 +129,8 @@ const API_KEY = '0e353f7fa86de4e23d8b45ed77a607b0';
       displayList(anime, 'anime-list');
     }
 
+    
+
     init();
+
+    

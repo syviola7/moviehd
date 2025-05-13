@@ -8,7 +8,6 @@
   <link rel="preload" href="css/home.css" as="style">
   <link rel="preload" href="js/home.js" as="script">
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <script defer src="js/home.js"></script>
   <link rel="icon" href="logo.png" type="image/png" />
 
@@ -19,27 +18,40 @@
   <div class="navbar">
     <div class="nav-links">
       <a href="index.html">MovieHD</a>
-      <input type="text" class="search-bar" placeholder="Search..." onfocus="openSearchModal()" />
+      <input type="text" class="search-bar" placeholder="Search" onfocus="openSearchModal()" />
     </div>
   </div>
+  <div class="movie-banner" style="position: relative; display: flex; align-items: center; justify-content: center;">
+    <div style="position: absolute; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8); text-align: center;">
+      <h2 style="background-color: rgba(0, 0, 0, 0.5);">Endless Movies, TV Shows & Anime</h2>
+      <p style="background-color: rgba(0, 0, 0, 0.5);">Old & New Movies, Just Search and Stream.</p>
+    </div>
+  </div>
+
+  <br>
+
 
   <div class="banner" id="banner">
     <h1 id="banner-title"></h1>
   </div>
 
-  <div class="row">
-    <h2>Trending Movies</h2>
-    <div class="list" id="movies-list"></div>
-  </div>
+  <div class="content-container">
+    <div class="card-grid">
+      <div class="card">
+        <h2>Movies</h2>
+        <div class="list" id="movies-list" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;"></div>
+      </div>
 
-  <div class="row">
-    <h2>Trending TV Shows</h2>
-    <div class="list" id="tvshows-list"></div>
-  </div>
+      <div class="card">
+        <h2>TV Shows</h2>
+        <div class="list" id="tvshows-list" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;"></div>
+      </div>
 
-  <div class="row">
-    <h2>Trending Anime</h2>
-    <div class="list" id="anime-list"></div>
+      <div class="card">
+        <h2>Anime</h2>
+        <div class="list" id="anime-list" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;"></div>
+      </div>
+    </div>
   </div>
 
   <div class="modal" id="modal">
@@ -74,7 +86,7 @@
 
 <footer class="footer">
   <div class="footer-content">
-    <p>&copy; 2025 My Website. All rights reserved.</p>
+    <p>&copy; 2025 MovieHD. All rights reserved.</p>
     <div class="footer-links">
       <a href="#">Disclaimer</a>
       <a href="#">About Us</a>
