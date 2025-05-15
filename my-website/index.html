@@ -11,8 +11,10 @@
   <!-- Preload JS -->
   <link rel="preload" href="js/home.js" as="script">
   <link rel="manifest" href="manifest.json">
-  <script defer src="js/home.js"></script>
+  <!-- Use WebP favicon if available, fallback to PNG -->
+  <link rel="icon" type="image/webp" href="logo.webp">
   <link rel="icon" href="logo.png" type="image/png" />
+  <script defer src="js/home.js"></script>
 
 </head>
 
@@ -61,7 +63,7 @@
     <div class="modal-content">
       <span class="close" onclick="closeModal()" style="color: red;">&times;</span>
       <div class="modal-body">
-        <img id="modal-image" src="" alt="" loading="lazy" />
+        <img id="modal-image" src="" alt="" loading="lazy" width="320" height="480" style="max-width:100%;height:auto;" />
         <div class="modal-text">
           <h2 id="modal-title"></h2>
           <div class="stars" id="modal-rating"></div>
