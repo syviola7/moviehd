@@ -167,7 +167,10 @@ async function searchMovies() {
   if (!query.trim()) return;
 
   try {
-    const res = await fetch(`https://cors-anywhere.herokuapp.com/${BASE_URL}/search/multi?api_key=${API_KEY}&query=${decodeURIComponent(query)}`, { mode: 'cors' });
+    // Use allorigins.win proxy to bypass CORS
+    const proxyUrl = 'https://api.allorigins.win/raw?url=';
+    const apiUrl = `${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`;
+    const res = await fetch(proxyUrl + encodeURIComponent(apiUrl));
     if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
     const data = await res.json();
     const results = data.results.filter(result => result.poster_path).slice(0, 5); // Limit to 5 results
@@ -266,48 +269,57 @@ function displaySearchResults() {
   }
   searchResults.innerHTML = '<p>Loading...</p>';
 
-fetch(`https://cors-anywhere.herokuapp.com/${BASE_URL}/search/multi?api_key=${API_KEY}&query=${decodeURIComponent(query)}`, { mode: 'cors' })    .then(res => {
-      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-      return res.json();
-    })
-    .then(data => {
-      searchResults.innerHTML = '';
-      const results = data.results.filter(result => result.poster_path);
-      if (results.length === 0) {
-        searchResults.innerHTML = `<p>No results found for "${decodeURIComponent(query)}".</p>`;
-        return;
-      }
-      results.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'card';
-        const img = document.createElement('img');
-        img.src = `${IMG_URL}${item.poster_path}`;
-        img.alt = item.title || item.name;
-        img.style.width = '200px';
-        img.style.height = '300px';
-        img.onclick = () => showDetails(item);
+  try {
+    // Use allorigins.win proxy to bypass CORS
+    const proxyUrl = 'https://api.allorigins.win/raw?url=';
+    const apiUrl = `${BASE_URL}/search/multi?api_key=${API_KEY}&query=${decodeURIComponent(query)}`;
+    fetch(proxyUrl + encodeURIComponent(apiUrl))
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+        return res.json();
+      })
+      .then(data => {
+        searchResults.innerHTML = '';
+        const results = data.results.filter(result => result.poster_path);
+        if (results.length === 0) {
+          searchResults.innerHTML = `<p>No results found for "${decodeURIComponent(query)}".</p>`;
+          return;
+        }
+        results.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'card';
+          const img = document.createElement('img');
+          img.src = `${IMG_URL}${item.poster_path}`;
+          img.alt = item.title || item.name;
+          img.style.width = '200px';
+          img.style.height = '300px';
+          img.onclick = () => showDetails(item);
 
-        const p1 = document.createElement('p');
-        p1.textContent = item.title || item.name;
-        p1.style.margin = '5px 0';
-        p1.style.fontSize = '14px';
+          const p1 = document.createElement('p');
+          p1.textContent = item.title || item.name;
+          p1.style.margin = '5px 0';
+          p1.style.fontSize = '14px';
 
-        const p2 = document.createElement('p');
-        p2.textContent = `${item.release_date ? new Date(item.release_date).getFullYear() : 'N/A'} • ${item.runtime || Math.floor(Math.random() * 180) + 60} min`;
-        p2.style.margin = '0';
-        p2.style.fontSize = '12px';
-        p2.style.color = '#ccc';
+          const p2 = document.createElement('p');
+          p2.textContent = `${item.release_date ? new Date(item.release_date).getFullYear() : 'N/A'} • ${item.runtime || Math.floor(Math.random() * 180) + 60} min`;
+          p2.style.margin = '0';
+          p2.style.fontSize = '12px';
+          p2.style.color = '#ccc';
 
-        div.appendChild(img);
-        div.appendChild(p1);
-        div.appendChild(p2);
-        searchResults.appendChild(div);
+          div.appendChild(img);
+          div.appendChild(p1);
+          div.appendChild(p2);
+          searchResults.appendChild(div);
+        });
+      })
+      .catch(error => {
+        console.error('Error fetching search results:', error);
+        searchResults.innerHTML = '<p>Error loading results. Please try again later.</p>';
       });
-    })
-    .catch(error => {
-      console.error('Error fetching search results:', error);
-      searchResults.innerHTML = '<p>Error loading results. Please check your connection or try again later.</p>';
-    });
+  } catch (error) {
+    console.error('Search results error:', error);
+    searchResults.innerHTML = '<p>Error loading results. Please check your connection.</p>';
+  }
 }
 
 // Ensure initialization runs on the correct page
