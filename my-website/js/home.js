@@ -256,6 +256,8 @@ document.addEventListener('click', (event) => {
   }
 });
 
+// ... (all your existing code remains the same until the end)
+
 async function init() {
   try {
     const movies = await fetchTrending('movie');
@@ -264,7 +266,7 @@ async function init() {
 
     const recommended = [...movies.slice(0, 15)];
     console.log('Combined recommended items:', recommended);
-    displayBanner(recommended[0]); // Display first item as banner
+    displayBanner(recommended[0]); // Optional: Set banner if needed
     displayList(recommended, 'recommended-list');
     displayList(tvShows, 'tv-shows-list', 16); // 16 items to match 4 rows with wrapping
     displayList(anime, 'anime-list', 16); // 16 items to match 4 rows with wrapping
@@ -272,3 +274,6 @@ async function init() {
     console.error('Error in init:', error);
   }
 }
+
+// Wait for DOM to load before initializing
+document.addEventListener('DOMContentLoaded', init);
