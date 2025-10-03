@@ -196,7 +196,7 @@ async function searchMovies() {
       dropdown.appendChild(div);
     });
 
-    // Add single "View all" link
+    // Add a single "View all" link at the end
     const viewAll = document.createElement('a');
     viewAll.href = '#';
     viewAll.className = 'view-all';
