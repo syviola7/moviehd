@@ -59,7 +59,7 @@ function displayBanner(item) {
 function displayList(items, containerId, limit = items.length) {
   const container = document.getElementById(containerId);
   if (!container) {
-    console.error(`Container ${containerId} not found in DOM`);
+    console.warn(`Container ${containerId} not found in DOM`);
     return;
   }
   container.innerHTML = '';
@@ -70,7 +70,7 @@ function displayList(items, containerId, limit = items.length) {
       return;
     }
     const div = document.createElement('div');
-    div.style.position = 'relative'; // Ensure this is relative to contain the span
+    div.style.position = 'relative';
 
     const img = document.createElement('img');
     img.src = `${IMG_URL}${item.poster_path}`;
@@ -82,19 +82,18 @@ function displayList(items, containerId, limit = items.length) {
 
     const span = document.createElement('span');
     span.style.position = 'absolute';
-    span.style.top = '5px'; // Top margin inside the image
-    span.style.right = '5px'; // Right margin inside the image
+    span.style.top = '5px';
+    span.style.right = '5px';
     span.style.backgroundColor = 'red';
     span.style.color = 'white';
     span.style.padding = '2px 5px';
     span.style.fontSize = '12px';
-    span.style.borderRadius = '3px'; // Optional: round the corners for better look
+    span.style.borderRadius = '3px';
     span.textContent = 'HD';
 
     const p1 = document.createElement('p');
     p1.style.margin = '5px 0';
     p1.style.fontSize = '14px';
-    // Truncate title if longer than 20 characters
     p1.textContent = (item.title || item.name).length > 20 
       ? (item.title || item.name).substring(0, 17) + '...' 
       : item.title || item.name;
@@ -103,7 +102,6 @@ function displayList(items, containerId, limit = items.length) {
     p2.style.margin = '0';
     p2.style.fontSize = '12px';
     p2.style.color = '#ccc';
-    // Use release_date for movies, first_air_date for TV/anime
     const releaseYear = item.release_date 
       ? new Date(item.release_date).getFullYear() 
       : item.first_air_date 
@@ -112,7 +110,7 @@ function displayList(items, containerId, limit = items.length) {
     p2.textContent = `${releaseYear} • ${Math.floor(Math.random() * 180) + 60} min`;
 
     div.appendChild(img);
-    div.appendChild(span); // Add span before text to ensure it's layered correctly
+    div.appendChild(span);
     div.appendChild(p1);
     div.appendChild(p2);
     container.appendChild(div);
