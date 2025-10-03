@@ -32,5 +32,12 @@
   </footer>
 
   <script src="js/home.js"></script>
+  
+  <!-- Ensure init runs after DOM is loaded -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      init();
+    });
+  </script>
 </body>
 </html>
