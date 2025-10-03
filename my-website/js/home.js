@@ -236,6 +236,8 @@ function showDetails(item) {
 }
 
 
+// ... (keep all existing functions like fetchTrending, displayBanner, etc. as they are)
+
 function displaySearchResults() {
   const urlParams = new URLSearchParams(window.location.search);
   const query = urlParams.get('query');
@@ -306,11 +308,14 @@ function displaySearchResults() {
 }
 
 // Ensure initialization runs on the correct page
-if (window.location.pathname.includes('index.html')) {
-  document.addEventListener('DOMContentLoaded', init);
-} else if (window.location.pathname.includes('search.html')) {
-  document.addEventListener('DOMContentLoaded', displaySearchResults);
-}
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.location.pathname.includes('index.html')) {
+    init();
+  } else if (window.location.pathname.includes('search.html')) {
+    displaySearchResults();
+  }
+});
+
 
 // Ensure the function runs when search.html loads
 if (window.location.pathname.includes('search.html')) {
