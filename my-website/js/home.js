@@ -167,9 +167,7 @@ async function searchMovies() {
   if (!query.trim()) return;
 
   try {
-    const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`, {
-      mode: 'cors', // Explicitly set CORS mode
-    });
+    const res = await fetch(`https://cors-anywhere.herokuapp.com/${BASE_URL}/search/multi?api_key=${API_KEY}&query=${decodeURIComponent(query)}`, { mode: 'cors' });
     if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
     const data = await res.json();
     const results = data.results.filter(result => result.poster_path).slice(0, 5); // Limit to 5 results
@@ -251,9 +249,6 @@ function showDetails(item) {
   window.location.href = `movie-detail.html?movie=${query}`;
 }
 
-// ... (previous code remains unchanged until displaySearchResults)
-
-// ... (all your existing code until displaySearchResults)
 
 function displaySearchResults() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -271,8 +266,7 @@ function displaySearchResults() {
   }
   searchResults.innerHTML = '<p>Loading...</p>';
 
-  fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${decodeURIComponent(query)}`, { mode: 'cors' })
-    .then(res => {
+fetch(`https://cors-anywhere.herokuapp.com/${BASE_URL}/search/multi?api_key=${API_KEY}&query=${decodeURIComponent(query)}`, { mode: 'cors' })    .then(res => {
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
       return res.json();
     })
@@ -323,14 +317,11 @@ if (window.location.pathname.includes('index.html')) {
   document.addEventListener('DOMContentLoaded', displaySearchResults);
 }
 
-// ... (rest of your code, including searchMovies, debounce, etc., remains unchanged)
-
 // Ensure the function runs when search.html loads
 if (window.location.pathname.includes('search.html')) {
   document.addEventListener('DOMContentLoaded', displaySearchResults);
 }
 
-// ... (rest of the code remains unchanged)
 
 function closeSearchDropdown() {
   const dropdown = document.getElementById('search-dropdown');

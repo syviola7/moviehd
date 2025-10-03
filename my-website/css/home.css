@@ -525,11 +525,7 @@ body {
   font-weight: lighter;
 }
 
-#recommended-list, #tv-shows-list, #anime-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
+
 
 /* Updated media queries for grid layout */
 @media (max-width: 768px) {
