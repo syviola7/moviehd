@@ -159,62 +159,77 @@ function changeServer() {
 async function searchMovies() {
   const query = document.getElementById('search-input').value;
   const dropdown = document.getElementById('search-dropdown');
+  if (!dropdown) {
+    console.error('Search dropdown element not found');
+    return;
+  }
   dropdown.innerHTML = ''; // Clear previous results
   dropdown.classList.remove('active');
 
   if (!query.trim()) return;
 
-  const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${query}`);
-  const data = await res.json();
-  const results = data.results.filter(result => result.poster_path).slice(0, 5); // Limit to 5 results
-
-  if (results.length > 0) {
-    dropdown.classList.add('active');
-    results.forEach(item => {
-      const div = document.createElement('div');
-      div.className = 'search-result-card';
-      div.onclick = () => {
-        closeSearchDropdown();
-        showDetails(item);
-      };
-
-      const img = document.createElement('img');
-      img.src = `${IMG_URL}${item.poster_path}`;
-      img.alt = item.title || item.name;
-
-      const info = document.createElement('div');
-      info.className = 'info';
-
-      const title = document.createElement('h3');
-      title.textContent = item.title || item.name;
-
-      const details = document.createElement('p');
-      details.innerHTML = `★ ${item.vote_average.toFixed(1)} · ${item.release_date ? new Date(item.release_date).getFullYear() : 'N/A'}`;
-
-      info.appendChild(title);
-      info.appendChild(details);
-      div.appendChild(img);
-      div.appendChild(info);
-      dropdown.appendChild(div);
+  try {
+    const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`, {
+      mode: 'cors', // Explicitly set CORS mode
     });
+    if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+    const data = await res.json();
+    const results = data.results.filter(result => result.poster_path).slice(0, 5); // Limit to 5 results
 
-    // Add single "View all" link
-    const viewAll = document.createElement('a');
-    viewAll.href = '#';
-    viewAll.className = 'view-all';
-    viewAll.textContent = 'View all';
-    viewAll.onclick = (event) => {
-      event.preventDefault();
-      window.location.href = `search.html?query=${encodeURIComponent(query)}`;
-    };
-    dropdown.appendChild(viewAll);
+    if (results.length > 0) {
+      dropdown.classList.add('active');
+      results.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'search-result-card';
+        div.onclick = () => {
+          closeSearchDropdown();
+          showDetails(item);
+        };
+
+        const img = document.createElement('img');
+        img.src = `${IMG_URL}${item.poster_path}`;
+        img.alt = item.title || item.name;
+
+        const info = document.createElement('div');
+        info.className = 'info';
+
+        const title = document.createElement('h3');
+        title.textContent = item.title || item.name;
+
+        const details = document.createElement('p');
+        details.innerHTML = `★ ${item.vote_average?.toFixed(1) || 'N/A'} · ${item.release_date ? new Date(item.release_date).getFullYear() : 'N/A'}`;
+
+        info.appendChild(title);
+        info.appendChild(details);
+        div.appendChild(img);
+        div.appendChild(info);
+        dropdown.appendChild(div);
+      });
+
+      // Add single "View all" link
+      const viewAll = document.createElement('a');
+      viewAll.href = '#';
+      viewAll.className = 'view-all';
+      viewAll.textContent = 'View all';
+      viewAll.onclick = (event) => {
+        event.preventDefault();
+        window.location.href = `search.html?query=${encodeURIComponent(query)}`;
+      };
+      dropdown.appendChild(viewAll);
+    } else {
+      dropdown.innerHTML = '<div style="padding: 10px;">No results found.</div>';
+      dropdown.classList.add('active');
+    }
+  } catch (error) {
+    console.error('Search error:', error);
+    dropdown.innerHTML = '<div style="padding: 10px;">Error loading results. Check console for details.</div>';
+    dropdown.classList.add('active');
   }
 }
 
-// Example event listener (adjust based on your HTML)
-document.getElementById('search-input').addEventListener('input', debounce(searchMovies, 300));
+// Event listener with debounce
+document.getElementById('search-input')?.addEventListener('input', debounce(searchMovies, 300));
 
-// Debounce function to prevent rapid calls
 function debounce(func, wait) {
   let timeout;
   return function executedFunction(...args) {
@@ -225,6 +240,17 @@ function debounce(func, wait) {
     clearTimeout(timeout);
     timeout = setTimeout(later, wait);
   };
+}
+
+// Ensure these functions are defined elsewhere in your code
+function closeSearchDropdown() {
+  const dropdown = document.getElementById('search-dropdown');
+  if (dropdown) dropdown.classList.remove('active');
+}
+
+function showDetails(item) {
+  const query = encodeURIComponent(JSON.stringify(item));
+  window.location.href = `movie-detail.html?movie=${query}`;
 }
 
 // ... (previous code remains unchanged until displaySearchResults)
