@@ -157,72 +157,55 @@ function changeServer() {
 async function searchMovies() {
   const query = document.getElementById('search-input').value;
   const dropdown = document.getElementById('search-dropdown');
-  if (!dropdown) {
-    console.error('Search dropdown element not found');
-    return;
-  }
   dropdown.innerHTML = ''; // Clear previous results
   dropdown.classList.remove('active');
 
   if (!query.trim()) return;
 
-  try {
-    // Use allorigins.win proxy to bypass CORS
-    const proxyUrl = 'https://api.allorigins.win/raw?url=';
-    const apiUrl = `${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`;
-    const res = await fetch(proxyUrl + encodeURIComponent(apiUrl));
-    if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-    const data = await res.json();
-    const results = data.results.filter(result => result.poster_path).slice(0, 5); // Limit to 5 results
+  const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${query}`);
+  const data = await res.json();
+  const results = data.results.filter(result => result.poster_path).slice(0, 5); // Limit to 5 results
 
-    if (results.length > 0) {
-      dropdown.classList.add('active');
-      results.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'search-result-card';
-        div.onclick = () => {
-          closeSearchDropdown();
-          showDetails(item);
-        };
-
-        const img = document.createElement('img');
-        img.src = `${IMG_URL}${item.poster_path}`;
-        img.alt = item.title || item.name;
-
-        const info = document.createElement('div');
-        info.className = 'info';
-
-        const title = document.createElement('h3');
-        title.textContent = item.title || item.name;
-
-        const details = document.createElement('p');
-        details.innerHTML = `★ ${item.vote_average?.toFixed(1) || 'N/A'} · ${item.release_date ? new Date(item.release_date).getFullYear() : 'N/A'}`;
-
-        info.appendChild(title);
-        info.appendChild(details);
-        div.appendChild(img);
-        div.appendChild(info);
-        dropdown.appendChild(div);
-      });
-
-      // Add single "View all" link
-      const viewAll = document.createElement('a');
-      viewAll.href = '#';
-      viewAll.className = 'view-all';
-      viewAll.textContent = 'View all';
-      viewAll.onclick = (event) => {
-        event.preventDefault();
-        window.location.href = `search.html?query=${encodeURIComponent(query)}`;
-      };
-      dropdown.appendChild(viewAll);
-    } else {
-      dropdown.innerHTML = '<div style="padding: 10px;">No results found.</div>';
-      dropdown.classList.add('active');
-    }
-  } catch (error) {
-    console.error('Search error:', error);
-    dropdown.innerHTML = '<div style="padding: 10px;">Error loading results. Check console for details.</div>';
+  if (results.length > 0) {
     dropdown.classList.add('active');
+    results.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'search-result-card';
+      div.onclick = () => {
+        closeSearchDropdown();
+        showDetails(item);
+      };
+
+      const img = document.createElement('img');
+      img.src = `${IMG_URL}${item.poster_path}`;
+      img.alt = item.title || item.name;
+
+      const info = document.createElement('div');
+      info.className = 'info';
+
+      const title = document.createElement('h3');
+      title.textContent = item.title || item.name;
+
+      const details = document.createElement('p');
+      details.innerHTML = `★ ${item.vote_average.toFixed(1)} · ${item.release_date ? new Date(item.release_date).getFullYear() : 'N/A'}`;
+
+      info.appendChild(title);
+      info.appendChild(details);
+      div.appendChild(img);
+      div.appendChild(info);
+      dropdown.appendChild(div);
+    });
+
+    // Add single "View all" link
+    const viewAll = document.createElement('a');
+    viewAll.href = '#';
+    viewAll.className = 'view-all';
+    viewAll.textContent = 'View all';
+    viewAll.onclick = (event) => {
+      event.preventDefault();
+      window.location.href = `search.html?query=${encodeURIComponent(query)}`;
+    };
+    dropdown.appendChild(viewAll);
   }
 }
 
