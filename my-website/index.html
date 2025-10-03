@@ -1,93 +1,74 @@
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
-<script type="text/javascript" data-cfasync="false">
-/*<![CDATA[/* */
-(function(){var n=window,f="b681e394f41443759014b38c49d0f894",b=[["siteId",208-624+762+5218697],["minBid",0],["popundersPerIP","0"],["delayBetween",0],["default",false],["defaultPerDay",0],["topmostLayer","auto"]],r=["d3d3LmJldHRlcmFkc3lzdGVtLmNvbS9ydWktYm9vdHN0cmFwLXRwbHMubWluLmNzcw==","ZDJrazBvM2ZyN2VkMDEuY2xvdWRmcm9udC5uZXQvTVNZL25zbmFiYnQubWluLmpz","d3d3LmVyZ3p2amRrZHV0cXMuY29tL2t1aS1ib290c3RyYXAtdHBscy5taW4uY3Nz","d3d3LnlkZ3ZrY25mLmNvbS9LRi9lc25hYmJ0Lm1pbi5qcw=="],q=-1,y,h,s=function(){clearTimeout(h);q++;if(r[q]&&!(1778847743000<(new Date).getTime()&&1<q)){y=n.document.createElement("script");y.type="text/javascript";y.async=!0;var d=n.document.getElementsByTagName("script")[0];y.src="https://"+atob(r[q]);y.crossOrigin="anonymous";y.onerror=s;y.onload=function(){clearTimeout(h);n[f.slice(0,16)+f.slice(0,16)]||s()};h=setTimeout(s,5E3);d.parentNode.insertBefore(y,d)}};if(!n[f]){try{Object.freeze(n[f]=b)}catch(e){}s()}})();
-/*]]>/* */
-</script>
-
-
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-V2SN4Z66BN"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-V2SN4Z66BN');
-</script>
-  
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="theme-color" content="#181818" />
   <title>MovieHD</title>
-  <!-- Preload and async load CSS for faster rendering -->
   <link rel="preload" href="css/home.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="css/home.css"></noscript>
-  <!-- Preload JS -->
+  <noscript>
+    <link rel="stylesheet" href="css/home.css">
+  </noscript>
   <link rel="preload" href="js/home.js" as="script">
-  <link rel="manifest" href="manifest.json">
-  <!-- Use WebP favicon if available, fallback to PNG -->
   <link rel="icon" type="image/webp" href="logo.webp">
   <link rel="icon" href="logo.png" type="image/png" />
   <script defer src="js/home.js"></script>
-
 </head>
 
-<body>
-  
+<body style="background-color: #181818; color: #fff; font-family: Arial, sans-serif;">
   <div class="navbar">
     <div class="nav-links">
-      <a href="index.html">MovieHD</a>
-      <input type="text" class="search-bar" placeholder="Search" onfocus="openSearchModal()" />
+      <a href="index.html" style="color: #fff; text-decoration: none; font-size: 24px;">MovieHD</a>
     </div>
-  </div>
-  <div class="movie-banner" style="position: relative; display: flex; align-items: center; justify-content: center;">
-    <div style="position: absolute; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8); text-align: center;">
-      <h2 style="background-color: rgba(0, 0, 0, 0.5);">Endless Movies, TV Shows & Anime</h2>
-      <p style="background-color: rgba(0, 0, 0, 0.5);">Old & New Movies, Just Search and Stream.</p>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search..." oninput="searchMovies()">
+      <div class="search-dropdown" id="search-dropdown"></div>
     </div>
   </div>
 
-  <br>
-
-
-  <div class="banner" id="banner">
-    <h1 id="banner-title"></h1>
+  <div class="movie-banner" id="banner"
+    style="font-family: 'Courier New', Courier, monospace; position: relative; height: 100px; background-color: #000; display: flex; align-items: center; justify-content: center;">
+    <div style="position: absolute; color: #fff; text-align: center;">
+      <h2 id="banner-title" style="background-color: rgba(0, 0, 0, 0.5); padding: 10px;">Endless Movies, TV Shows &
+        Anime</h2>
+      <p style="background-color: rgba(0, 0, 0, 0.5); padding: 5px;">Old & New Movies, Just Search and Stream.</p>
+    </div>
   </div>
 
-  <div class="content-container">
-    <div class="card-grid">
-      <div class="card">
-        <h2>Movies</h2>
-        <div class="list" id="movies-list" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;"></div>
+  <div class="content-container" style="padding: 20px;">
+    <div class="card-grid" style="display: flex; flex-direction: column; gap: 20px;">
+      <div class="card" style="flex: 1; min-width: 200px;">
+        <h2>Lastest Movies</h2>
+        <div class="list" id="recommended-list"></div>
       </div>
-
-      <div class="card">
-        <h2>TV Shows</h2>
-        <div class="list" id="tvshows-list" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;"></div>
+      <div class="card" style="flex: 1; min-width: 200px;">
+        <h2>Tv Shows</h2>
+        <div class="list" id="tv-shows-list"></div>
       </div>
-
-      <div class="card">
+      <div class="card" style="flex: 1; min-width: 200px;">
         <h2>Anime</h2>
-        <div class="list" id="anime-list" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;"></div>
+        <div class="list" id="anime-list"></div>
       </div>
     </div>
   </div>
 
-  <div class="modal" id="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal()" style="color: red;">&times;</span>
+  <div class="modal" id="modal"
+    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); justify-content: center; align-items: center;">
+    <div class="modal-content"
+      style="position: relative; background-color: #000; padding: 20px; max-width: 800px; max-height: 90vh; overflow-y: auto;">
+      <span class="close" onclick="closeModal()"
+        style="color: red; font-size: 24px; cursor: pointer; position: absolute; top: 10px; right: 10px;">&times;</span>
       <div class="modal-body">
-        <img id="modal-image" src="" alt="" loading="lazy" width="320" height="480" style="max-width:100%;height:auto;" />
+        <img id="modal-image" src="" alt="" loading="lazy" style="max-width: 100%; height: auto;" />
         <div class="modal-text">
           <h2 id="modal-title"></h2>
           <div class="stars" id="modal-rating"></div>
           <p id="modal-description"></p>
         </div>
       </div>
-      <div class="server-selector">
+      <div class="server-selector" style="margin-top: 20px;">
         <label for="server">Change Server:</label>
         <select id="server" onchange="changeServer()">
           <option value="vidsrc.cc">Vidsrc.cc</option>
@@ -99,22 +80,16 @@
     </div>
   </div>
 
-  <div class="search-modal" id="search-modal">
-    <span class="close" onclick="closeSearchModal()" style="color: red;">&times;</span>
-    <input type="text" id="search-input" placeholder="Search for a movie or show..." oninput="searchTMDB()" />
-    <div class="results" id="search-results"></div>
-  </div>
-
-<footer class="footer">
-  <div class="footer-content">
-    <p>&copy; 2025 MovieHD. All rights reserved.</p>
-    <div class="footer-links">
-      <a href="#">Disclaimer</a>
-      <a href="#">About Us</a>
-      <a href="#">Contact Us</a>
+  <footer class="footer" style="background-color: #000; padding: 10px; text-align: center; margin-top: 20px;">
+    <div class="footer-content">
+      <p>&copy; 2025 MovieHD. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="#" style="color: #fff; margin: 0 10px; text-decoration: none;">Disclaimer</a>
+        <a href="#" style="color: #fff; margin: 0 10px; text-decoration: none;">About Us</a>
+        <a href="#" style="color: #fff; margin: 0 10px; text-decoration: none;">Contact Us</a>
+      </div>
     </div>
-  </div>
-</footer>
-
-  
+  </footer>
 </body>
+
+</html>
