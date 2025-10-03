@@ -1,11 +1,11 @@
-const API_KEY = 'a1e72fd93ed59f56e6332813b9f8dcae'; // Replace with your actual API key
+const API_KEY = 'a1e72fd93ed59f56e6332813b9f8dcae';
 const BASE_URL = 'https://api.themoviedb.org/3';
 const IMG_URL = 'https://image.tmdb.org/t/p/original';
 let currentItem;
 
 async function fetchTrending(type) {
   try {
-    const res = await fetch(`${BASE_URL}/trending/${type}/week?api_key=${API_KEY}`, { mode: 'cors' });
+    const res = await fetch(`${BASE_URL}/trending/${type}/week?api_key=${API_KEY}`);
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     const data = await res.json();
     console.log(`Fetched ${type} data:`, data.results);
@@ -26,8 +26,9 @@ async function fetchTrendingAnime() {
     let allResults = [];
     const pagePromises = [];
     for (let page = 1; page <= 3; page++) {
-      pagePromises.push(fetch(`${BASE_URL}/trending/tv/week?api_key=${API_KEY}&page=${page}`, { mode: 'cors' }));
+      pagePromises.push(fetch(`${BASE_URL}/trending/tv/week?api_key=${API_KEY}&page=${page}`));
     }
+
     const responses = await Promise.all(pagePromises);
     for (const res of responses) {
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
@@ -77,10 +78,7 @@ function displayList(items, containerId, limit = items.length) {
     img.style.width = '200px';
     img.style.height = '300px';
     img.style.objectFit = 'cover';
-    img.onclick = () => {
-      currentItem = item;
-      showDetails(item);
-    };
+    img.onclick = () => showDetails(item);
 
     const span = document.createElement('span');
     span.style.position = 'absolute';
@@ -121,30 +119,26 @@ function displayList(items, containerId, limit = items.length) {
 
 function showDetails(item) {
   const query = encodeURIComponent(JSON.stringify(item));
-  console.log('Redirecting to:', `movie-detail.html?movie=${query}`);
+  console.log('Redirecting to:', `movie-detail.html?movie=${query}`); // Debug log to confirm click
   window.location.href = `movie-detail.html?movie=${query}`;
 }
 
 function openSearchModal() {
-  document.getElementById('search-modal')?.style.display = 'flex';
-  document.getElementById('search-input')?.focus();
+  document.getElementById('search-modal').style.display = 'flex';
+  document.getElementById('search-input').focus();
 }
 
 function closeModal() {
-  document.getElementById('modal')?.style.display = 'none';
-  document.getElementById('modal-video')?.src = '';
+  document.getElementById('modal').style.display = 'none';
+  document.getElementById('modal-video').src = '';
 }
 
 function closeSearchModal() {
-  document.getElementById('search-modal')?.style.display = 'none';
-  document.getElementById('search-results')?.innerHTML = '';
+  document.getElementById('search-modal').style.display = 'none';
+  document.getElementById('search-results').innerHTML = '';
 }
 
 function changeServer() {
-  if (!currentItem) {
-    console.warn('No current item selected for server change');
-    return;
-  }
   const server = document.getElementById('server').value;
   const type = currentItem.media_type === "movie" ? "movie" : "tv";
   let embedURL = "";
@@ -157,8 +151,7 @@ function changeServer() {
     embedURL = `https://player.videasy.net/${type}/${currentItem.id}`;
   }
 
-  const modalVideo = document.getElementById('modal-video');
-  if (modalVideo) modalVideo.src = embedURL;
+  document.getElementById('modal-video').src = embedURL;
 }
 
 async function searchMovies() {
@@ -175,7 +168,7 @@ async function searchMovies() {
 
   try {
     const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`, {
-      mode: 'cors',
+      mode: 'cors', // Explicitly set CORS mode
     });
     if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
     const data = await res.json();
@@ -232,6 +225,9 @@ async function searchMovies() {
   }
 }
 
+// Event listener with debounce
+document.getElementById('search-input')?.addEventListener('input', debounce(searchMovies, 300));
+
 function debounce(func, wait) {
   let timeout;
   return function executedFunction(...args) {
@@ -244,9 +240,101 @@ function debounce(func, wait) {
   };
 }
 
+// Ensure these functions are defined elsewhere in your code
 function closeSearchDropdown() {
   const dropdown = document.getElementById('search-dropdown');
   if (dropdown) dropdown.classList.remove('active');
+}
+
+function showDetails(item) {
+  const query = encodeURIComponent(JSON.stringify(item));
+  window.location.href = `movie-detail.html?movie=${query}`;
+}
+
+// ... (previous code remains unchanged until displaySearchResults)
+
+// ... (all your existing code until displaySearchResults)
+
+function displaySearchResults() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const query = urlParams.get('query');
+  if (!query) {
+    const searchResults = document.getElementById('search-results');
+    if (searchResults) searchResults.innerHTML = '<p>No search query provided.</p>';
+    return;
+  }
+
+  const searchResults = document.getElementById('search-results');
+  if (!searchResults) {
+    console.error('Search results container not found!');
+    return;
+  }
+  searchResults.innerHTML = '<p>Loading...</p>';
+
+  fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${decodeURIComponent(query)}`, { mode: 'cors' })
+    .then(res => {
+      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+      return res.json();
+    })
+    .then(data => {
+      searchResults.innerHTML = '';
+      const results = data.results.filter(result => result.poster_path);
+      if (results.length === 0) {
+        searchResults.innerHTML = `<p>No results found for "${decodeURIComponent(query)}".</p>`;
+        return;
+      }
+      results.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'card';
+        const img = document.createElement('img');
+        img.src = `${IMG_URL}${item.poster_path}`;
+        img.alt = item.title || item.name;
+        img.style.width = '200px';
+        img.style.height = '300px';
+        img.onclick = () => showDetails(item);
+
+        const p1 = document.createElement('p');
+        p1.textContent = item.title || item.name;
+        p1.style.margin = '5px 0';
+        p1.style.fontSize = '14px';
+
+        const p2 = document.createElement('p');
+        p2.textContent = `${item.release_date ? new Date(item.release_date).getFullYear() : 'N/A'} • ${item.runtime || Math.floor(Math.random() * 180) + 60} min`;
+        p2.style.margin = '0';
+        p2.style.fontSize = '12px';
+        p2.style.color = '#ccc';
+
+        div.appendChild(img);
+        div.appendChild(p1);
+        div.appendChild(p2);
+        searchResults.appendChild(div);
+      });
+    })
+    .catch(error => {
+      console.error('Error fetching search results:', error);
+      searchResults.innerHTML = '<p>Error loading results. Please check your connection or try again later.</p>';
+    });
+}
+
+// Ensure initialization runs on the correct page
+if (window.location.pathname.includes('index.html')) {
+  document.addEventListener('DOMContentLoaded', init);
+} else if (window.location.pathname.includes('search.html')) {
+  document.addEventListener('DOMContentLoaded', displaySearchResults);
+}
+
+// ... (rest of your code, including searchMovies, debounce, etc., remains unchanged)
+
+// Ensure the function runs when search.html loads
+if (window.location.pathname.includes('search.html')) {
+  document.addEventListener('DOMContentLoaded', displaySearchResults);
+}
+
+// ... (rest of the code remains unchanged)
+
+function closeSearchDropdown() {
+  const dropdown = document.getElementById('search-dropdown');
+  dropdown.classList.remove('active');
 }
 
 document.addEventListener('click', (event) => {
@@ -256,8 +344,6 @@ document.addEventListener('click', (event) => {
   }
 });
 
-// ... (all your existing code remains the same until the end)
-
 async function init() {
   try {
     const movies = await fetchTrending('movie');
@@ -266,7 +352,6 @@ async function init() {
 
     const recommended = [...movies.slice(0, 15)];
     console.log('Combined recommended items:', recommended);
-    displayBanner(recommended[0]); // Optional: Set banner if needed
     displayList(recommended, 'recommended-list');
     displayList(tvShows, 'tv-shows-list', 16); // 16 items to match 4 rows with wrapping
     displayList(anime, 'anime-list', 16); // 16 items to match 4 rows with wrapping
@@ -275,5 +360,4 @@ async function init() {
   }
 }
 
-// Wait for DOM to load before initializing
-document.addEventListener('DOMContentLoaded', init);
+init();
