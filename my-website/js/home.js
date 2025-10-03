@@ -159,7 +159,7 @@ function changeServer() {
 async function searchMovies() {
   const query = document.getElementById('search-input').value;
   const dropdown = document.getElementById('search-dropdown');
-  dropdown.innerHTML = '';
+  dropdown.innerHTML = ''; // Clear previous results
   dropdown.classList.remove('active');
 
   if (!query.trim()) return;
@@ -198,16 +198,33 @@ async function searchMovies() {
       dropdown.appendChild(div);
     });
 
+    // Add single "View all" link
     const viewAll = document.createElement('a');
     viewAll.href = '#';
     viewAll.className = 'view-all';
     viewAll.textContent = 'View all';
     viewAll.onclick = (event) => {
       event.preventDefault();
-      window.location.href = `search.html?query=${encodeURIComponent(query)}`; // Redirect to a search results page
+      window.location.href = `search.html?query=${encodeURIComponent(query)}`;
     };
     dropdown.appendChild(viewAll);
   }
+}
+
+// Example event listener (adjust based on your HTML)
+document.getElementById('search-input').addEventListener('input', debounce(searchMovies, 300));
+
+// Debounce function to prevent rapid calls
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
 }
 
 // ... (previous code remains unchanged until displaySearchResults)
