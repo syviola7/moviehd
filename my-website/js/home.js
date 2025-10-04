@@ -70,13 +70,15 @@ function displayList(items, containerId, limit = items.length) {
       return;
     }
     const div = document.createElement('div');
-    div.style.position = 'relative';
+    div.style.position = 'relative'; // Set as positioning context
+    div.style.width = '150px';
+    div.style.margin = '0 auto';
 
     const img = document.createElement('img');
     img.src = `${IMG_URL}${item.poster_path}`;
     img.alt = item.title || item.name;
-    img.style.width = '200px';
-    img.style.height = '300px';
+    img.style.width = '100%';
+    img.style.height = '225px';
     img.style.objectFit = 'cover';
     img.onclick = () => showDetails(item);
 
@@ -89,6 +91,7 @@ function displayList(items, containerId, limit = items.length) {
     span.style.padding = '2px 5px';
     span.style.fontSize = '12px';
     span.style.borderRadius = '3px';
+    span.style.zIndex = '1'; // Ensure it stays above other elements
     span.textContent = 'HD';
 
     const p1 = document.createElement('p');
@@ -110,7 +113,7 @@ function displayList(items, containerId, limit = items.length) {
     p2.textContent = `${releaseYear} • ${Math.floor(Math.random() * 180) + 60} min`;
 
     div.appendChild(img);
-    div.appendChild(span);
+    div.appendChild(span); // Ensure span is appended after img
     div.appendChild(p1);
     div.appendChild(p2);
     container.appendChild(div);
@@ -119,7 +122,7 @@ function displayList(items, containerId, limit = items.length) {
 
 function showDetails(item) {
   const query = encodeURIComponent(JSON.stringify(item));
-  console.log('Redirecting to:', `movie-detail.html?movie=${query}`); // Debug log to confirm click
+  console.log('Redirecting to:', `movie-detail.html?movie=${query}`);
   window.location.href = `movie-detail.html?movie=${query}`;
 }
 
@@ -157,14 +160,14 @@ function changeServer() {
 async function searchMovies() {
   const query = document.getElementById('search-input').value;
   const dropdown = document.getElementById('search-dropdown');
-  dropdown.innerHTML = ''; // Clear previous results
+  dropdown.innerHTML = '';
   dropdown.classList.remove('active');
 
   if (!query.trim()) return;
 
   const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${query}`);
   const data = await res.json();
-  const results = data.results.filter(result => result.poster_path).slice(0, 5); // Limit to 5 results
+  const results = data.results.filter(result => result.poster_path).slice(0, 5);
 
   if (results.length > 0) {
     dropdown.classList.add('active');
@@ -196,7 +199,6 @@ async function searchMovies() {
       dropdown.appendChild(div);
     });
 
-    // Add a single "View all" link at the end
     const viewAll = document.createElement('a');
     viewAll.href = '#';
     viewAll.className = 'view-all';
@@ -209,7 +211,6 @@ async function searchMovies() {
   }
 }
 
-// Event listener with debounce
 document.getElementById('search-input')?.addEventListener('input', debounce(searchMovies, 300));
 
 function debounce(func, wait) {
@@ -224,7 +225,6 @@ function debounce(func, wait) {
   };
 }
 
-// Ensure these functions are defined elsewhere in your code
 function closeSearchDropdown() {
   const dropdown = document.getElementById('search-dropdown');
   if (dropdown) dropdown.classList.remove('active');
@@ -234,7 +234,6 @@ function showDetails(item) {
   const query = encodeURIComponent(JSON.stringify(item));
   window.location.href = `movie-detail.html?movie=${query}`;
 }
-
 
 function displaySearchResults() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -253,7 +252,6 @@ function displaySearchResults() {
   searchResults.innerHTML = '<p>Loading...</p>';
 
   try {
-    // Use allorigins.win proxy to bypass CORS
     const proxyUrl = 'https://api.allorigins.win/raw?url=';
     const apiUrl = `${BASE_URL}/search/multi?api_key=${API_KEY}&query=${decodeURIComponent(query)}`;
     fetch(proxyUrl + encodeURIComponent(apiUrl))
@@ -305,22 +303,10 @@ function displaySearchResults() {
   }
 }
 
-// Ensure initialization runs on the correct page
 if (window.location.pathname.includes('index.html')) {
   document.addEventListener('DOMContentLoaded', init);
 } else if (window.location.pathname.includes('search.html')) {
   document.addEventListener('DOMContentLoaded', displaySearchResults);
-}
-
-// Ensure the function runs when search.html loads
-if (window.location.pathname.includes('search.html')) {
-  document.addEventListener('DOMContentLoaded', displaySearchResults);
-}
-
-
-function closeSearchDropdown() {
-  const dropdown = document.getElementById('search-dropdown');
-  dropdown.classList.remove('active');
 }
 
 document.addEventListener('click', (event) => {
@@ -339,8 +325,8 @@ async function init() {
     const recommended = [...movies.slice(0, 15)];
     console.log('Combined recommended items:', recommended);
     displayList(recommended, 'recommended-list');
-    displayList(tvShows, 'tv-shows-list', 16); // 16 items to match 4 rows with wrapping
-    displayList(anime, 'anime-list', 16); // 16 items to match 4 rows with wrapping
+    displayList(tvShows, 'tv-shows-list', 16);
+    displayList(anime, 'anime-list', 16);
   } catch (error) {
     console.error('Error in init:', error);
   }
